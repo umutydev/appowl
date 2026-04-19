@@ -4,7 +4,7 @@ class Place {
   final double latitude;
   final double longitude;
   final bool isOpenNow;
-  final String address; // Google'dan mekanın açık adresini de alacağız
+  final String address;
 
   Place({
     required this.name,
@@ -15,14 +15,13 @@ class Place {
     required this.address,
   });
 
-  // Gelen karmaşık Google JSON verisini bizim modele çeviren fabrika
   factory Place.fromJson(Map<String, dynamic> json, String categoryName) {
     return Place(
       name: json['name'] ?? 'Bilinmeyen Mekan',
       category: categoryName,
       latitude: json['geometry']['location']['lat'],
       longitude: json['geometry']['location']['lng'],
-      // Eğer Google saat bilgisi vermediyse varsayılan olarak açık gösterelim
+      // Google opening_hours vermezse varsayılan olarak açık kabul ediyoruz
       isOpenNow: json['opening_hours'] != null
           ? json['opening_hours']['open_now']
           : true,

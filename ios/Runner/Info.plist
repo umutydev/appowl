@@ -24,8 +24,18 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>https</string>
+		<string>http</string>
+		<string>maps</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Owl, sana en yakın mekanları bulabilmek için konumuna ihtiyaç duyuyor.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Owl, sana en yakın nöbetçi eczane ve mekanları göstermek için konumuna ihtiyaç duyuyor.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -66,10 +76,5 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Owl, sana en yakın nöbetçi eczane ve mekanları göstermek için konumuna ihtiyaç duyuyor.</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Owl, sana en yakın mekanları bulabilmek için konumuna ihtiyaç duyuyor.</string>
 </dict>
 </plist>

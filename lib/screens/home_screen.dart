@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/places_services.dart';
 import '../models/place.dart';
 import '../data/places_service.dart';
+import '../data/map_utils.dart'; // MapUtils kuryemizi unutma
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -9,10 +10,11 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF121212), // Koyu arka plan
       appBar: AppBar(
         title: const Text(
           'Owl 🦉',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
@@ -23,6 +25,7 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Arama Çubuğu (Görseldeki gibi şık)
             TextField(
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
@@ -147,6 +150,7 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
+// --- Kategori Detay Sayfası (Yol Tarifi Eklenmiş Hali) ---
 class CategoryDetailScreen extends StatelessWidget {
   final String categoryName;
   const CategoryDetailScreen({super.key, required this.categoryName});
@@ -154,12 +158,13 @@ class CategoryDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF121212),
       appBar: AppBar(
         title: Text(categoryName.replaceAll('\n', ' ')),
         backgroundColor: Colors.transparent,
+        foregroundColor: Colors.white,
         elevation: 0,
       ),
-      // FutureBuilder: İnternetten veri gelene kadar yükleniyor animasyonu gösterir
       body: FutureBuilder<List<Place>>(
         future: PlacesService.fetchNearbyPlaces(categoryName),
         builder: (context, snapshot) {
@@ -233,11 +238,15 @@ class CategoryDetailScreen extends StatelessWidget {
                       ),
                     ],
                   ),
+                  // Mavi Navigasyon İkonu
                   trailing: const Icon(
-                    Icons.arrow_forward_ios,
-                    size: 16,
-                    color: Colors.grey,
+                    Icons.directions,
+                    color: Colors.blueAccent,
                   ),
+                  onTap: () {
+                    // Tıklandığında telefonun haritasını açar
+                    MapUtils.openMap(place.latitude, place.longitude);
+                  },
                 ),
               );
             },

@@ -124,7 +124,7 @@ class _MainNavigationState extends State<MainNavigation> {
           BottomNavigationBarItem(icon: Icon(Icons.explore), label: 'Keşfet'),
           BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Harita'),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Ara'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profail'),
         ],
       ),
     );

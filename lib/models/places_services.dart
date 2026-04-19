@@ -4,17 +4,16 @@ import 'package:geolocator/geolocator.dart';
 import '../models/place.dart';
 
 class PlacesService {
-  static const String apiKey =
-      "AIzaSyDeJyj39Y57g-0TPLUIIcBJGa70V__NRkI"; // Şifreni buraya gir!
+  // BURAYA KENDİ GOOGLE API ANAHTARINI YAPIŞTIR
+  static const String apiKey = "AIzaSyDeJyj39Y57g-0TPLUIIcBJGa70V__NRkI";
 
+  // Kategorilere (Eczane, Restoran) göre arama
   static Future<List<Place>> fetchNearbyPlaces(String category) async {
     try {
-      // 1. Önce kullanıcının anlık konumunu alalım (Haritada yaptığımızın aynısı)
       Position pos = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
 
-      // 2. Tıklanan kategoriye göre Google'da ne arayacağımızı seçelim
       String type = '';
       if (category.contains("Eczane"))
         type = "pharmacy";
@@ -25,24 +24,41 @@ class PlacesService {
       else
         type = "store";
 
-      // 3. Google'a atacağımız API isteği (2000 metre çapında arıyoruz)
       final String url =
-          'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${pos.latitude},${pos.longitude}&radius=2000&type=$type&key=$apiKey';
-
-      // 4. İsteği gönder ve cevabı bekle
+          'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${pos.latitude},${pos.longitude}&radius=2500&type=$type&key=$apiKey';
       final response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final List results = data['results'];
-
-        // Gelen listeyi bizim Place modeline çevir
         return results.map((json) => Place.fromJson(json, category)).toList();
-      } else {
-        return [];
       }
+      return [];
     } catch (e) {
-      print("Hata oluştu: $e");
+      print("Hata: $e");
+      return [];
+    }
+  }
+
+  // Arama çubuğu için metin araması (Google Text Search)
+  static Future<List<Place>> searchPlaces(String query) async {
+    if (query.isEmpty) return [];
+    try {
+      Position pos = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      final String url =
+          'https://maps.googleapis.com/maps/api/place/textsearch/json?query=$query&location=${pos.latitude},${pos.longitude}&radius=5000&key=$apiKey';
+
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final List results = data['results'];
+        return results.map((json) => Place.fromJson(json, "Arama")).toList();
+      }
+      return [];
+    } catch (e) {
+      print("Arama Hatası: $e");
       return [];
     }
   }
