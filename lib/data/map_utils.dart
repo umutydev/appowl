@@ -1,26 +1,40 @@
 import 'package:url_launcher/url_launcher.dart';
-import 'dart:io';
+import 'package:flutter/foundation.dart'
+    show kIsWeb, defaultTargetPlatform, TargetPlatform;
 
 class MapUtils {
-  static Future<void> openMap(double latitude, double longitude) async {
-    final String googleUrl =
-        'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
-    final String appleUrl = 'https://maps.apple.com/?q=$latitude,$longitude';
+  MapUtils._();
 
-    if (Platform.isIOS) {
-      if (await canLaunchUrl(Uri.parse(appleUrl))) {
+  static Future<void> openMap(
+    double latitude,
+    double longitude,
+    String destinationName,
+  ) async {
+    // Google Maps Yönlendirme URL'si (En garantisi budur)
+    final String googleMapsUrl =
+        "https://www.google.com/maps/dir/?api=1&destination=$latitude,$longitude&destination_place_id=$destinationName";
+
+    // Apple Haritalar (Sadece iOS için)
+    final String appleMapsUrl =
+        "https://maps.apple.com/?daddr=$latitude,$longitude&q=$destinationName";
+
+    try {
+      if (kIsWeb) {
+        // Web'de (Chrome) direkt yeni sekmede Google Maps açar
         await launchUrl(
-          Uri.parse(appleUrl),
+          Uri.parse(googleMapsUrl),
           mode: LaunchMode.externalApplication,
         );
+      } else {
+        // Mobilde cihazın işletim sistemine göre davranır
+        if (defaultTargetPlatform == TargetPlatform.iOS) {
+          await launchUrl(Uri.parse(appleMapsUrl));
+        } else {
+          await launchUrl(Uri.parse(googleMapsUrl));
+        }
       }
-    } else {
-      if (await canLaunchUrl(Uri.parse(googleUrl))) {
-        await launchUrl(
-          Uri.parse(googleUrl),
-          mode: LaunchMode.externalApplication,
-        );
-      }
+    } catch (e) {
+      print("Harita başlatılamadı: $e");
     }
   }
 }

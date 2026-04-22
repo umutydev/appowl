@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/models/places_services.dart';
+import 'package:flutter_application_1/data/places_service.dart';
 import '../data/places_service.dart';
 import '../models/place.dart';
 import '../data/map_utils.dart'; // Yeni ekledik
@@ -97,6 +97,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             onTap: () => MapUtils.openMap(
                               place.latitude,
                               place.longitude,
+                              place.name,
                             ), // Tıklayınca haritaya uçar
                           ),
                         );

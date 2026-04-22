@@ -25,7 +25,8 @@ class Place {
       isOpenNow: json['opening_hours'] != null
           ? json['opening_hours']['open_now']
           : true,
-      address: json['vicinity'] ?? 'Adres bulunamadı',
+      address:
+          json['vicinity'] ?? 'Adres Verileri Yükleniyor...', //Düzeltilecek
     );
   }
 }

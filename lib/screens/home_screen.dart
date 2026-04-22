@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/models/places_services.dart';
+import 'package:flutter_application_1/data/places_service.dart';
 import '../models/place.dart';
 import '../data/places_service.dart';
 import '../data/map_utils.dart'; // MapUtils kuryemizi unutma
@@ -25,25 +25,6 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Arama Çubuğu (Görseldeki gibi şık)
-            TextField(
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                hintText: 'Ne arıyorsun? (Eczane, Restoran...)',
-                hintStyle: const TextStyle(color: Colors.grey),
-                prefixIcon: const Icon(
-                  Icons.search,
-                  color: Colors.orangeAccent,
-                ),
-                filled: true,
-                fillColor: const Color(0xFF1E1E1E),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-            const SizedBox(height: 25),
             const Text(
               "Hızlı Erişim",
               style: TextStyle(
@@ -245,7 +226,11 @@ class CategoryDetailScreen extends StatelessWidget {
                   ),
                   onTap: () {
                     // Tıklandığında telefonun haritasını açar
-                    MapUtils.openMap(place.latitude, place.longitude);
+                    MapUtils.openMap(
+                      place.latitude,
+                      place.longitude,
+                      place.name,
+                    );
                   },
                 ),
               );

@@ -11,7 +11,7 @@ import GoogleMaps // <-- 1. Burayı ekledik
   ) -> Bool {
     
     // 2. Kopyaladığın API anahtarını buraya yapıştırıyoruz
-    GMSServices.provideAPIKey("AIzaSyDeJyj39Y57g-0TPLUIIcBJGa70V__NRkI")
+    GMSServices.provideAPIKey("AIzaSyD3P98B7U8QlZx0xo9R5M6arOlrekWfsxQ")
     
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
