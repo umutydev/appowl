@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:firebase_core/firebase_core.dart'; // FIREBASE EKLENDİ
+import 'firebase_options.dart'; // FIREBASE EKLENDİ
 
 // Diğer klasördeki ekranlarımızı buraya çağırıyoruz
 import 'screens/home_screen.dart';
+import 'screens/map_screen.dart'; // YENİ HARİTA EKRANIMIZ BURADA!
 import 'screens/search_screen.dart';
 import 'screens/profile_screen.dart';
+import 'screens/login_screen.dart'; // LOGİN EKRANI
 
-void main() {
+void main() async {
+  // Flutter motorunu ve Firebase'i başlatıyoruz
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   runApp(const OwlApp());
 }
 
@@ -24,7 +30,8 @@ class OwlApp extends StatelessWidget {
         primarySwatch: Colors.orange,
         scaffoldBackgroundColor: const Color(0xFF121212),
       ),
-      home: const MainNavigation(),
+      // UYGULAMA ARTIK DİREKT GİRİŞ EKRANINDAN BAŞLAYACAK
+      home: const LoginScreen(),
     );
   }
 }
@@ -36,68 +43,13 @@ class MainNavigation extends StatefulWidget {
   State<MainNavigation> createState() => _MainNavigationState();
 }
 
-Future<Position> _getCurrentLocation() async {
-  bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  if (!serviceEnabled) return Future.error('Konum servisi kapalı.');
-
-  LocationPermission permission = await Geolocator.checkPermission();
-  if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) {
-      return Future.error('İzin reddedildi.');
-    }
-  }
-  return await Geolocator.getCurrentPosition();
-}
-
-late GoogleMapController _mapController;
-
 class _MainNavigationState extends State<MainNavigation> {
   int _selectedIndex = 0;
 
+  // BAK KANKA: GoogleMap spagettisi gitti, yerine sadece MapScreen() geldi!
   static final List<Widget> _pages = <Widget>[
     const HomeScreen(),
-    Stack(
-      children: [
-        GoogleMap(
-          initialCameraPosition: const CameraPosition(
-            target: LatLng(41.0082, 28.9784),
-            zoom: 14.0,
-          ),
-          myLocationEnabled: true,
-          onMapCreated: (GoogleMapController controller) async {
-            _mapController = controller;
-
-            // Harita açılır açılmaz konumu otomatik bul ve kamerayı oraya uçur
-            try {
-              var pos = await _getCurrentLocation();
-              _mapController.animateCamera(
-                CameraUpdate.newLatLngZoom(
-                  LatLng(pos.latitude, pos.longitude),
-                  15.0, // 15.0 seviyesi sokakları güzel gösteren bir yakınlaştırmadır
-                ),
-              );
-            } catch (e) {
-              debugPrint("Konum alınamadı: $e");
-            }
-          },
-        ),
-        Positioned(
-          bottom: 16,
-          right: 16,
-          child: FloatingActionButton(
-            backgroundColor: Colors.white,
-            child: const Icon(Icons.my_location, color: Colors.blue),
-            onPressed: () async {
-              var pos = await _getCurrentLocation();
-              _mapController.animateCamera(
-                CameraUpdate.newLatLng(LatLng(pos.latitude, pos.longitude)),
-              );
-            },
-          ),
-        ),
-      ],
-    ),
+    const MapScreen(), // Bütün harita, sekmeler ve işaretçiler bu dosyanın içinde!
     const SearchScreen(),
     const ProfileScreen(),
   ];

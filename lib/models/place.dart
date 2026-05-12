@@ -29,4 +29,6 @@ class Place {
           json['vicinity'] ?? 'Adres Verileri Yükleniyor...', //Düzeltilecek
     );
   }
+
+  String? get id => null;
 }

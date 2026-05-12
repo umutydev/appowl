@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "478832334301",
+    "project_id": "the-owl-493408",
+    "storage_bucket": "the-owl-493408.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:478832334301:android:259b5a87bfb3732c5d5234",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHIAwOP8TA4nITorA2gMnmuUPUdlGOlgU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
