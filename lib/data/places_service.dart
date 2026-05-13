@@ -15,8 +15,7 @@ class PlacesService {
 
       String type = '';
       String keyword = '';
-      bool requireOpen =
-          true; // Owl Gece Rehberi olduğu için varsayılan olarak açık yerleri isteyelim
+      bool requireOpen = true; // Owl Gece Rehberi olduğu için varsayılan açık
 
       String lowerCat = category.toLowerCase();
 
@@ -32,16 +31,18 @@ class PlacesService {
       } else if (lowerCat.contains("taksi")) {
         type = "taxi_stand";
         keyword = "taksi";
-        requireOpen =
-            false; // Taksilerin çalışma saatleri API'de girilmez, açık zorunluluğunu kaldır.
+        requireOpen = false; // Taksilerin çalışma saatleri API'de girilmez
       } else if (lowerCat.contains("market")) {
-        type = "convenience_store";
+        // 🚨 ÇÖZÜM BURADA: Türkiye Şartlarına Uygun Arama 🚨
+        type = ""; // type kısıtlamasını sildik, her türden marketi bulacak
         keyword = "market";
+        // Esnaf çalışma saatini girmediği için açık olsa bile eleniyordu.
+        // False yaptık ki hepsi listelensin, durumu panelde Açık/Kapalı olarak gözüksün.
+        requireOpen = false;
       } else if (lowerCat.contains("hastane")) {
         type = "hospital";
         keyword = "";
-        requireOpen =
-            false; // Hastaneler için açık olma şartını kaldır, zaten 7/24'tür.
+        requireOpen = false; // Hastaneler zaten 7/24'tür
       } else {
         keyword = category.replaceAll('\n', ' ');
         requireOpen = false;
@@ -100,7 +101,7 @@ class PlacesService {
     }
   }
 
-  // ⏰ Belirli bir mekanın detaylı çalışma saatlerini çeken yepyeni fonksiyon
+  // ⏰ Belirli bir mekanın detaylı çalışma saatlerini çeken fonksiyon
   static Future<List<String>> fetchPlaceHours(String placeId) async {
     try {
       final String url =
@@ -111,7 +112,6 @@ class PlacesService {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['result'] != null && data['result']['opening_hours'] != null) {
-          // Gün gün saatleri liste olarak alıyoruz
           return List<String>.from(
             data['result']['opening_hours']['weekday_text'] ?? [],
           );
