@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/data/places_service.dart';
-import 'package:flutter_application_1/screens/login_screen.dart';
 import '../models/place.dart';
 import '../data/places_service.dart';
-import '../data/map_utils.dart'; // MapUtils kuryemizi unutma
+import '../data/map_utils.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../data/report_service.dart';
+import '../widgets/modern_place_card.dart'; // KARTIMIZI BURADAN ÇAĞIRIYORUZ
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF121212), // Koyu arka plan
+      backgroundColor: const Color(0xFF121212),
       appBar: AppBar(
         title: const Text(
           'Owl 🦉',
@@ -131,10 +133,70 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-// --- Kategori Detay Sayfası (Yol Tarifi Eklenmiş Hali) ---
 class CategoryDetailScreen extends StatelessWidget {
   final String categoryName;
   const CategoryDetailScreen({super.key, required this.categoryName});
+
+  void _showReportSheet(BuildContext context, String placeId) {
+    final List<String> reportOptions = [
+      "Bu mekan kapandı",
+      "Mekan taşınmış",
+      "Taksi bulunmuyor",
+      "Burası çok kalabalık",
+      "Polis çevirmesi var",
+      "ATM bozuk",
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1E1E1E),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Canlı Durum Bildir 📢",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 15),
+              ...reportOptions.map(
+                (option) => ListTile(
+                  leading: const Icon(
+                    Icons.campaign,
+                    color: Colors.orangeAccent,
+                  ),
+                  title: Text(
+                    option,
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  onTap: () async {
+                    await ReportService.sendReport(placeId, option);
+                    if (!context.mounted) return;
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("Bildirimin iletildi: $option 🦉"),
+                        backgroundColor: Colors.orangeAccent,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -165,73 +227,20 @@ class CategoryDetailScreen extends StatelessWidget {
           }
 
           final places = snapshot.data!;
-
           return ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: places.length,
             itemBuilder: (context, index) {
               final place = places[index];
 
-              return Card(
-                color: const Color(0xFF1E1E1E),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                margin: const EdgeInsets.only(bottom: 15),
-                child: ListTile(
-                  contentPadding: const EdgeInsets.all(15),
-                  leading: CircleAvatar(
-                    backgroundColor: place.isOpenNow
-                        ? Colors.green.withOpacity(0.1)
-                        : Colors.redAccent.withOpacity(0.1),
-                    child: Icon(
-                      Icons.location_on,
-                      color: place.isOpenNow ? Colors.green : Colors.redAccent,
-                    ),
-                  ),
-                  title: Text(
-                    place.name,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 5),
-                      Text(
-                        place.isOpenNow ? "Şu an açık" : "Şu an kapalı",
-                        style: TextStyle(
-                          color: place.isOpenNow
-                              ? Colors.green
-                              : Colors.redAccent,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        place.address,
-                        style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                  // Mavi Navigasyon İkonu
-                  trailing: const Icon(
-                    Icons.directions,
-                    color: Colors.blueAccent,
-                  ),
-                  onTap: () {
-                    // Tıklandığında telefonun haritasını açar
-                    MapUtils.openMap(
-                      place.latitude,
-                      place.longitude,
-                      place.name,
-                    );
-                  },
+              // WIDGET KLASÖRÜNDEN GELEN TERTEMİZ KART
+              return ModernPlaceCard(
+                place: place,
+                onReportTap: () => _showReportSheet(context, place.id),
+                onDirectionsTap: () => MapUtils.openMap(
+                  place.latitude,
+                  place.longitude,
+                  place.name,
                 ),
               );
             },

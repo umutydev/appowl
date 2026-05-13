@@ -4,7 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import '../models/place.dart';
 
 class PlacesService {
-  // API ANAHTARIN (Aynı kaldı)
+  // API ANAHTARIN
   static const String apiKey = "AIzaSyD3P98B7U8QlZx0xo9R5M6arOlrekWfsxQ";
 
   static Future<List<Place>> fetchNearbyPlaces(String category) async {
@@ -38,8 +38,7 @@ class PlacesService {
         type = "convenience_store";
         keyword = "market";
       } else if (lowerCat.contains("hastane")) {
-        type =
-            "hospital"; // İŞTE ÇÖZÜM: İsminde hastane yazmasa bile tipi hastane olanları bulur!
+        type = "hospital";
         keyword = "";
         requireOpen =
             false; // Hastaneler için açık olma şartını kaldır, zaten 7/24'tür.
@@ -98,6 +97,30 @@ class PlacesService {
     } catch (e) {
       print("Arama Hatası: $e");
       return [];
+    }
+  }
+
+  // ⏰ Belirli bir mekanın detaylı çalışma saatlerini çeken yepyeni fonksiyon
+  static Future<List<String>> fetchPlaceHours(String placeId) async {
+    try {
+      final String url =
+          'https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&fields=opening_hours&key=$apiKey&language=tr';
+
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['result'] != null && data['result']['opening_hours'] != null) {
+          // Gün gün saatleri liste olarak alıyoruz
+          return List<String>.from(
+            data['result']['opening_hours']['weekday_text'] ?? [],
+          );
+        }
+      }
+      return ["Saat bilgisi bulunamadı."];
+    } catch (e) {
+      print("Saat Hatası: $e");
+      return ["Bağlantı hatası."];
     }
   }
 }
